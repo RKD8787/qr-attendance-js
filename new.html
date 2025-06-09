@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced QR Attendance System</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e5aa8, #2d6bb5);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .session-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .page {
+            display: none;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Enhanced Admin Page Styles */
+        .admin-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-value.present { color: #28a745; }
+        .stat-value.absent { color: #dc3545; }
+        .stat-value.percentage { color: #007bff; }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .present-students-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .present-students h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 4px solid #007bff;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .student-item:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .student-time {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: scale(1.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .qr-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .qr-section h3 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.3rem;
+            line-height: 1.5;
+        }
+
+        .qr-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .qr-code:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+        }
+
+        .qr-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .qr-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .qr-expired {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .qr-instruction {
+            color: #666;
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Enhanced Student Page Styles */
+        .student-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .student-selection h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 300;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .student-list {
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .student-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 18px 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .student-checkbox:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-color: #007bff;
+            transform: translateX(5px);
+        }
+
+        .student-checkbox.selected {
+            background: linear-gradient(135deg, #e7f3ff, #cce7ff);
+            border-color: #007bff;
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .student-checkbox input {
+            margin-right: 15px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        .student-checkbox label {
+            font-size: 16px;
+            cursor: pointer;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .student-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Enhanced Success Page */
+        .success-message {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        .success-message h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            font-weight: 300;
+        }
+
+        .success-message p {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 50px;
+            animation: scaleIn 0.8s ease;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0) rotate(-180deg); }
+            50% { transform: scale(1.1) rotate(-90deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .success-details {
+            background: rgba(40, 167, 69, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* Enhanced Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 35px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .modal input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .modal-buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Reports Section */
+        .reports-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .admin-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 250px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+
+            .session-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .qr-code {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Offline Indicator */
+        .offline-banner {
+            background: #dc3545;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1002;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .offline-banner.show {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="offline-banner" class="offline-banner">
+        ⚠️ You are currently offline. Some features may not work properly.
+    </div>
+
+    <div class="header">
+        <h1>Dayananda Sagar College Of Engineering</h1>
+        <p>Smart Attendance Management System</p>
+        <div class="session-info">
+            <div>📅 Session: <span id="current-date"></span></div>
+            <div>⏰ Time: <span id="current-time"></span></div>
+            <div>🏫 Subject: Computer Networks</div>
+            <div>👨‍🏫 Faculty: Dr. Rajesh Kumar</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showPage('admin')">📊 Faculty Dashboard</button>
+            <button class="nav-btn" onclick="showPage('student')">👨‍🎓 Mark Attendance</button>
+            <button class="nav-btn" onclick="showPage('reports')">📈 Reports</button>
+        </div>
+
+        <!-- Enhanced Admin/Faculty Page -->
+        <div id="admin-page" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value present" id="present-count">0</div>
+                    <div class="stat-label">Present</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value absent" id="absent-count">45</div>
+                    <div class="stat-label">Absent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value percentage" id="attendance-percentage">0%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-students">45</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <div class="present-students-card">
+                    <h3>
+                        👥 Present Students
+                        <button class="nav-btn" onclick="exportAttendance()" style="margin-left: auto; padding: 8px 15px; font-size: 12px;">
+                            📋 Export
+                        </button>
+                    </h3>
+                    <div id="present-students-list">
+                        <div class="student-item" style="opacity: 0.5; font-style: italic;">
+                            <div class="student-info">
+                                <div class="student-name">No students marked present yet</div>
+                                <div class="student-time">Start scanning QR codes or add manually</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn-primary" onclick="showAddManuallyModal()">
+                            ➕ Add Manually
+                        </button>
+                        <button class="action-btn btn-warning" onclick="clearAllAttendance()">
+                            🗑️ Clear All
+                        </button>
+                        <button class="action-btn btn-success" onclick="markAllPresent()">
+                            ✅ Mark All Present
+                        </button>
+                    </div>
+                </div>
+
+                <div class="qr-section">
+                    <h3>📱 QR Code for Attendance</h3>
+                    <div class="qr-container">
+                        <div class="qr-code" id="qr-code">
+                            <div style="text-align: center;">
+                                <div style="font-size: 60px; margin-bottom: 15px;">📱</div>
+                                <div>Generating QR Code...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qr-status qr-active" id="qr-status">
+                        🟢 QR Code Active - Valid for <span id="qr-timer">5:00</span>
+                    </div>
+                    <p class="qr-instruction">
+                        📋 <strong>Instructions:</strong><br>
+                        1. Connect to college Wi-Fi<br>
+                        2. Scan the QR code with your phone<br>
+                        3. Select your name and submit<br>
+                        4. QR code refreshes every 5 minutes for security
+                    </p>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="action-btn btn-primary" onclick="generateQR()" style="flex: 1;">
+                            🔄 Refresh QR
+                        </button>
+                        <button class="action-btn btn-success" onclick="toggleQRStatus()" style="flex: 1;" id="qr-toggle">
+                            ⏸️ Pause QR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Student Page -->
+        <div id="student-page" class="page">
+            <div class="student-selection">
+                <h2>📝 Mark Your Attendance</h2>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="student-search" 
+                           placeholder="🔍 Search your name or roll number..." 
+                           oninput="filterStudents()">
+                </div>
+                <div class="student-list" id="student-list">
+                    <!-- Students will be populated by JavaScript -->
+                </div>
+                <button class="submit-btn" id="submit-attendance" onclick="submitAttendance()" disabled>
+                    ✅ Submit Attendance
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports-page" class="page">
+            <div class="reports-section">
+                <h2>📊 Attendance Reports & Analytics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Average Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Classes Conducted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">35</div>
+                        <div class="stat-label">Regular Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Irregular Students</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    📈 Attendance Trends Chart<br>
+                    <small>(Chart visualization would be implemented with actual charting library)</small>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn btn-primary" onclick="exportFullReport()">
+                        📊 Export Full Report
+                    </button>
+                    <button class="action-btn btn-success" onclick="emailReport()">
+                        📧 Email Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Success Page -->
+        <div id="success-page" class="page">
+            <div class="success-message">
+                <div class="checkmark">✓</div>
+                <h2>Attendance Submitted Successfully!</h2>
+                <p>Your attendance has been recorded for today's session.</p>
+                <div class="success-details">
+                    <div><strong>Date:</strong> <span id="success-date"></span></div>
+                    <div><strong>Time:</strong> <span id="success-time"></span></div>
+                    <div><strong>Subject:</strong> Computer Networks</div>
+                </div>
+                <p style="margin-top: 20px; color: #28a745; font-weight: 500;">
+                    Thank you for being punctual! You may close this page.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Add Manually Modal -->
+    <div id="add-manually-modal" class="modal">
+        <div class="modal-content">
+            <h3>➕ Add Student Manually</h3>
+            <input type="text" id="manual-student-name" placeholder="Enter student name">
+            <input type="text" id="manual-student-roll" placeholder="Enter roll number (optional)">
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="addStudentManually()">Add Student</button>
+                <button class="modal-btn secondary" onclick="closeAddManuallyModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <h3>⚠️ Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to perform this action?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="confirm-yes">Yes, Continue</button>
+                <button class="modal-btn secondary" onclick="closeConfirmationModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Enhanced Student Data with more details
+        const allStudents = [
+            { name: 'Arjun Sharma', roll: '1DS20CS001', email: 'arjun@dsce.edu.in' },
+            { name: 'Priya Patel', roll: '1DS20CS002', email: 'priya@dsce.edu.in' },
+            { name: 'Rohit Kumar', roll: '1DS20CS003', email: 'rohit@dsce.edu.in' },
+            { name: 'Sneha Gupta', roll: '1DS20CS004', email: 'sneha@dsce.edu.in' },
+            { name: 'Vikram Singh', roll: '1DS20CS005', email: 'vikram@dsce.edu.in' },
+            { name: 'Anita Verma', roll: '1DS20CS006', email: 'anita@dsce.edu.in' },
+            { name: 'Rajesh Yadav', roll: '1DS20CS007', email: 'rajesh@dsce.edu.in' },
+            { name: 'Kavya Nair', roll: '1DS20CS008', email: 'kavya@dsce.edu.in' },
+            { name: 'Aditya Joshi', roll: '1DS20CS009', email: 'aditya@dsce.edu.in' },
+            { name: 'Riya Malhotra', roll: '1DS20CS010', email: 'riya@dsce.edu.in' },
+            { name: 'Sanjay Thakur', roll: '1DS20CS011', email: 'sanjay@dsce.edu.in' },
+            { name: 'Pooja Reddy', roll: '1DS20CS012', email: 'pooja@dsce.edu.in' },
+            { name: 'Harsh Agarwal', roll: '1DS20CS013', email: 'harsh@dsce.edu.in' },
+            { name: 'Megha Kapoor', roll: '1DS20CS014', email: 'megha@dsce.edu.in' },
+            { name: 'Nikhil Bansal', roll: '1DS20CS015', email: 'nikhil@dsce.edu.in' },
+            { name: 'Shreya Sinha', roll: '1DS20CS016', email: 'shreya@dsce.edu.in' },
+            { name: 'Amit Sharma', roll: '1DS20CS017', email: 'amit@dsce.edu.in' },
+            { name: 'Deepika Gupta', roll: '1DS20CS018', email: 'deepika@dsce.edu.in' },
+            { name: 'Karan Patel', roll: '1DS20CS019', email: 'karan@dsce.edu.in' },
+            { name: 'Neha Singh', roll: '1DS20CS020', email: 'neha@dsce.edu.in' },
+            { name: 'Rahul Kumar', roll: '1DS20CS021', email: 'rahul@dsce.edu.in' },
+            { name: 'Sakshi Verma', roll: '1DS20CS022', email: 'sakshi@dsce.edu.in' },
+            { name: 'Varun Joshi', roll: '1DS20CS023', email: 'varun@dsce.edu.in' },
+            { name: 'Tanya Nair', roll: '1DS20CS024', email: 'tanya@dsce.edu.in' },
+            { name: 'Aman Thakur', roll: '1DS20CS025', email: 'aman@dsce.edu.in' },
+            { name: 'Ritika Reddy', roll: '1DS20CS026', email: 'ritika@dsce.edu.in' },
+            { name: 'Akash Agarwal', roll: '1DS20CS027', email: 'akash@dsce.edu.in' },
+            { name: 'Swati Kapoor', roll: '1DS20CS028', email: 'swati@dsce.edu.in' },
+            { name: 'Rohit Bansal', roll: '1DS20CS029', email: 'rohit.b@dsce.edu.in' },
+            { name: 'Kavita Sinha', roll: '1DS20CS030', email: 'kavita@dsce.edu.in' },
+            { name: 'Manish Sharma', roll: '1DS20CS031', email: 'manish@dsce.edu.in' },
+            { name: 'Priyanka Gupta', roll: '1DS20CS032', email: 'priyanka@dsce.edu.in' },
+            { name: 'Siddharth Patel', roll: '1DS20CS033', email: 'siddharth@dsce.edu.in' },
+            { name: 'Anjali Singh', roll: '1DS20CS034', email: 'anjali@dsce.edu.in' },
+            { name: 'Naveen Kumar', roll: '1DS20CS035', email: 'naveen@dsce.edu.in' },
+            { name: 'Kritika Verma', roll: '1DS20CS036', email: 'kritika@dsce.edu.in' },
+            { name: 'Abhishek Joshi', roll: '1DS20CS037', email: 'abhishek@dsce.edu.in' },
+            { name: 'Shruti Nair', roll: '1DS20CS038', email: 'shruti@dsce.edu.in' },
+            { name: 'Vishal Thakur', roll: '1DS20CS039', email: 'vishal@dsce.edu.in' },
+            { name: 'Nisha Reddy', roll: '1DS20CS040', email: 'nisha@dsce.edu.in' },
+            { name: 'Gaurav Agarwal', roll: '1DS20CS041', email: 'gaurav@dsce.edu.in' },
+            { name: 'Shweta Kapoor', roll: '1DS20CS042', email: 'shweta@dsce.edu.in' },
+            { name: 'Aryan Bansal', roll: '1DS20CS043', email: 'aryan@dsce.edu.in' },
+            { name: 'Ritu Sinha', roll: '1DS20CS044', email: 'ritu@dsce.edu.in' },
+            { name: 'Manoj Sharma', roll: '1DS20CS045', email: 'manoj@dsce.edu.in' }
+        ];
+
+        // Enhanced application state
+        let presentStudents = [];
+        let selectedStudents = [];
+        let filteredStudents = [...allStudents];
+        let qrTimer = 300; // 5 minutes in seconds
+        let qrInterval;
+        let qrActive = true;
+        let timeInterval;
+
+        // Initialize the application
+        function initApp() {
+            populateStudentList();
+            updateAllStats();
+            generateQR();
+            startQRTimer();
+            updateDateTime();
+            startTimeUpdate();
+            checkOnlineStatus();
+            
+            // Load saved data from localStorage if available
+            loadSavedData();
+        }
+
+        // Enhanced page navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(page + '-page').classList.add('active');
+            event.target.classList.add('active');
+
+            // Specific page actions
+            if (page === 'reports') {
+                generateReportData();
+            }
+        }
+
+        // Enhanced student list population with search functionality
+        function populateStudentList() {
+            const studentList = document.getElementById('student-list');
+            studentList.innerHTML = '';
+            
+            filteredStudents.forEach((student, index) => {
+                const originalIndex = allStudents.findIndex(s => s.roll === student.roll);
+                const studentDiv = document.createElement('div');
+                studentDiv.className = 'student-checkbox';
+                studentDiv.onclick = () => toggleStudent(originalIndex);
+                
+                const isSelected = selectedStudents.some(s => s.roll === student.roll);
+                if (isSelected) {
+                    studentDiv.classList.add('selected');
+                }
+                
+                studentDiv.innerHTML = `
+                    <input type="checkbox" id="student-${originalIndex}" 
+                           ${isSelected ? 'checked' : ''} 
+                           onchange="toggleStudent(${originalIndex})">
+                    <label for="student-${originalIndex}">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-details">Roll: ${student.roll} | Email: ${student.email}</div>
+                    </label>
+                `;
+                
+                studentList.appendChild(studentDiv);
+            });
+        }
+
+        // Enhanced student search functionality
+        function filterStudents() {
+            const searchTerm = document.getElementById('student-search').value.toLowerCase();
+            filteredStudents = allStudents.filter(student => 
+                student.name.toLowerCase().includes(searchTerm) ||
+                student.roll.toLowerCase().includes(searchTerm) ||
+                student.email.toLowerCase().includes(searchTerm)
+            );
+            populateStudentList();
+        }
+
+        // Enhanced student selection toggle
+        function toggleStudent(index) {
+            const student = allStudents[index];
+            const checkbox = document.getElementById(`student-${index}`);
+            const studentDiv = checkbox.parentElement;
+            
+            if (checkbox.checked) {
+                if (!selectedStudents.some(s => s.roll === student.roll)) {
+                    selectedStudents.push(student);
+                }
+                studentDiv.classList.add('selected');
+            } else {
+                selectedStudents = selectedStudents.filter(s => s.roll !== student.roll);
+                studentDiv.classList.remove('selected');
+            }
+            
+            document.getElementById('submit-attendance').disabled = selectedStudents.length === 0;
+        }
+
+        // Enhanced attendance submission
+        function submitAttendance() {
+            if (selectedStudents.length === 0) return;
+            
+            const currentTime = new Date();
+            selectedStudents.forEach(student => {
+                const existingIndex = presentStudents.findIndex(p => p.roll === student.roll);
+                if (existingIndex === -1) {
+                    presentStudents.push({
+                        ...student,
+                        timestamp: currentTime.toLocaleString()
+                    });
+                }
+            });
+            
+            updatePresentStudentsList();
+            updateAllStats();
+            saveData();
+            showSuccessPage();
+            showNotification('Attendance submitted successfully!', 'success');
+        }
+
+        // Enhanced success page display
+        function showSuccessPage() {
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            document.getElementById('success-page').classList.add('active');
+            
+            // Update success page details
+            const now = new Date();
+            document.getElementById('success-date').textContent = now.toLocaleDateString();
+            document.getElementById('success-time').textContent = now.toLocaleTimeString();
+            
+            setTimeout(() => {
+                resetStudentSelection();
+                showPage('student');
+            }, 5000);
+        }
+
+        // Reset student selection
+        function resetStudentSelection() {
+            selectedStudents = [];
+            document.querySelectorAll('.student-checkbox input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('.student-checkbox').forEach(div => {
+                div.classList.remove('selected');
+            });
+            document.getElementById('submit-attendance').disabled = true;
+            document.getElementById('student-search').value = '';
+            filteredStudents = [...allStudents];
+            populateStudentList();
+        }
+
+        // Enhanced present students list update
+        function updatePresentStudentsList() {
+            const listContainer = document.getElementById('present-students-list');
+            
+            if (presentStudents.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="student-item" style="opacity: 0.5; font-style: italic;">
+                        <div class="student-info">
+                            <div class="student-name">No students marked present yet</div>
+                            <div class="student-time">Start scanning QR codes or add manually</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            listContainer.innerHTML = '';
+            presentStudents.forEach((student, index) => {
+                const studentDiv = document.createElement('div');
+                studentDiv.className = 'student-item';
+                studentDiv.innerHTML = `
+                    <div class="student-info">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-time">Roll: ${student.roll} | Time: ${student.timestamp}</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeStudent(${index})">Remove</button>
+                `;
+                listContainer.appendChild(studentDiv);
+            });
+        }
+
+        // Remove student from present list
+        function removeStudent(index) {
+            const studentName = presentStudents[index].name;
+            presentStudents.splice(index, 1);
+            updatePresentStudentsList();
+            updateAllStats();
+            saveData();
+            showNotification(`${studentName} removed from attendance`, 'warning');
+        }
+
+        // Enhanced statistics update
+        function updateAllStats() {
+            const presentCount = presentStudents.length;
+            const totalCount = allStudents.length;
+            const absentCount = totalCount - presentCount;
+            const percentage = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
+            
+            document.getElementById('present-count').textContent = presentCount;
+            document.getElementById('absent-count').textContent = absentCount;
+            document.getElementById('total-students').textContent = totalCount;
+            document.getElementById('attendance-percentage').textContent = percentage + '%';
+        }
+
+        // Enhanced QR code generation
+        function generateQR() {
+            const qrCode = document.getElementById('qr-code');
+            const qrPatterns = [
+                '█▀▀▀▀▀█ ▀▀█▄▀ █▀▀▀▀▀█<br>█ ███ █ ██▀▄█ █ ███ █<br>█ ▀▀▀ █ ▀█▀▄▀ █ ▀▀▀ █<br>▀▀▀▀▀▀▀ ▀ █▄█ ▀▀▀▀▀▀▀<br>▀▀█▄▀▀▀▀▀▄██▀▀▀▀█▀▀▄▀<br>▀ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀<br>█▀▀▀▀▀█ ▀▀▀▀▀ ▀█▀▀▀▀<br>█ ███ █ ▀▀▀█▀▀█▀▀▀▀▀<br>█ ▀▀▀ █ ▀▀▀▀▀▀▀▀▀▀▀▀▀',
+                '█▀▀▀▀▀█ █▄█▄█ █▀▀▀▀▀█<br>█ ███ █ ▀▀▄▀▀ █ ███ █<br>█ ▀▀▀ █ █▄▀▄█ █ ▀▀▀ █<br>▀▀▀▀▀▀▀ ▀▄▀▄▀ ▀▀▀▀▀▀▀<br>█▄▀▄▀▄▀▀▀█▀▀▄▀▀▀█▄▀▄▀<br>▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀<br>█▀▀▀▀▀█ ▀▄▄▄▄ ▀█▄▄▄▄<br>█ ███ █ ▀▀▀▀▀▀█▀▀▀▀▀<br>█ ▀▀▀ █ ▀▀▀▀▀▀▀▀▀▀▀▀▀',
+                '█▀▀▀▀▀█ ▀█▀▄▀ █▀▀▀▀▀█<br>█ ███ █ ▄▄▀▄▄ █ ███ █<br>█ ▀▀▀ █ ▀█▄▀▀ █ ▀▀▀ █<br>▀▀▀▀▀▀▀ ▀▄█▄▀ ▀▀▀▀▀▀▀<br>▀▄█▄▀▄▀▀▄▄▀▀▄▀▀▄█▄▀▄▀<br>▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀<br>█▀▀▀▀▀█ ▄▄▄▄▄ █▄▄▄▄▄<br>█ ███ █ ▀▀▀▀▀▀▀▀▀▀▀▀▀<br>█ ▀▀▀ █ ▀▀▀▀▀▀▀▀▀▀▀▀▀'
+            ];
+            
+            const sessionId = Date.now().toString(36);
+            const randomPattern = qrPatterns[Math.floor(Math.random() * qrPatterns.length)];
+            qrCode.innerHTML = `
+                <div style="font-family: monospace; line-height: 0.8; font-size: 8px; text-align: center;">
+                    ${randomPattern}
+                </div>
+            `;
+            
+            resetQRTimer();
+            showNotification('New QR code generated', 'success');
+        }
+
+        // QR Timer functionality
+        function startQRTimer() {
+            qrInterval = setInterval(() => {
+                if (qrActive && qrTimer > 0) {
+                    qrTimer--;
+                    updateQRStatus();
+                } else if (qrTimer <= 0) {
+                    generateQR();
+                }
+            }, 1000);
+        }
+
+        function resetQRTimer() {
+            qrTimer = 300; // Reset to 5 minutes
+            updateQRStatus();
+        }
+
+        function updateQRStatus() {
+            const minutes = Math.floor(qrTimer / 60);
+            const seconds = qrTimer % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            const statusElement = document.getElementById('qr-status');
+            const timerElement = document.getElementById('qr-timer');
+            
+            if (qrActive) {
+                statusElement.className = 'qr-status qr-active';
+                statusElement.innerHTML = `🟢 QR Code Active - Valid for <span id="qr-timer">${timeString}</span>`;
+            } else {
+                statusElement.className = 'qr-status qr-expired';
+                statusElement.innerHTML = '🔴 QR Code Paused - Click Resume to activate';
+            }
+        }
+
+        function toggleQRStatus() {
+            qrActive = !qrActive;
+            const toggleBtn = document.getElementById('qr-toggle');
+            
+            if (qrActive) {
+                toggleBtn.textContent = '⏸️ Pause QR';
+                showNotification('QR code activated', 'success');
+            } else {
+                toggleBtn.textContent = '▶️ Resume QR';
+                showNotification('QR code paused', 'warning');
+            }
+            
+            updateQRStatus();
+        }
+
+        // Enhanced manual student addition
+        function showAddManuallyModal() {
+            document.getElementById('add-manually-modal').style.display = 'block';
+            document.getElementById('manual-student-name').focus();
+        }
+
+        function closeAddManuallyModal() {
+            document.getElementById('add-manually-modal').style.display = 'none';
+            document.getElementById('manual-student-name').value = '';
+            document.getElementById('manual-student-roll').value = '';
+        }
+
+        function addStudentManually() {
+            const studentName = document.getElementById('manual-student-name').value.trim();
+            const studentRoll = document.getElementById('manual-student-roll').value.trim();
+            
+            if (!studentName) {
+                showNotification('Please enter a valid student name!', 'error');
+                return;
+            }
+            
+            // Check if student already present
+            if (presentStudents.some(s => s.name.toLowerCase() === studentName.toLowerCase())) {
+                showNotification('Student is already marked present!', 'warning');
+                return;
+            }
+            
+            const newStudent = {
+                name: studentName,
+                roll: studentRoll || 'Manual Entry',
+                email: 'manual@dsce.edu.in',
+                timestamp: new Date().toLocaleString()
+            };
+            
+            presentStudents.push(newStudent);
+            updatePresentStudentsList();
+            updateAllStats();
+            saveData();
+            closeAddManuallyModal();
+            
+            showNotification(`${studentName} added successfully!`, 'success');
+        }
+
+        // Bulk operations
+        function clearAllAttendance() {
+            showConfirmationModal(
+                'Are you sure you want to clear all attendance records?',
+                () => {
+                    presentStudents = [];
+                    updatePresentStudentsList();
+                    updateAllStats();
+                    saveData();
+                    showNotification('All attendance records cleared', 'success');
+                }
+            );
+        }
+
+        function markAllPresent() {
+            showConfirmationModal(
+                'Are you sure you want to mark all students as present?',
+                () => {
+                    const currentTime = new Date().toLocaleString();
+                    allStudents.forEach(student => {
+                        if (!presentStudents.some(p => p.roll === student.roll)) {
+                            presentStudents.push({
+                                ...student,
+                                timestamp: currentTime
+                            });
+                        }
+                    });
+                    updatePresentStudentsList();
+                    updateAllStats();
+                    saveData();
+                    showNotification('All students marked present', 'success');
+                }
+            );
+        }
+
+        // Export functionality
+        function exportAttendance() {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Name,Roll Number,Email,Timestamp\n"
+                + presentStudents.map(s => `${s.name},${s.roll},${s.email},${s.timestamp}`).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `attendance_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Attendance exported successfully!', 'success');
+        }
+
+        function exportFullReport() {
+            showNotification('Full report export feature coming soon!', 'warning');
+        }
+
+        function emailReport() {
+            showNotification('Email report feature coming soon!', 'warning');
+        }
+
+        // Reports page functionality
+        function generateReportData() {
+            // Simulate report generation
+            showNotification('Report data refreshed', 'success');
+        }
+
+        // Utility functions
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+        }
+
+        function startTimeUpdate() {
+            timeInterval = setInterval(updateDateTime, 1000);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showConfirmationModal(message, onConfirm) {
+            document.getElementById('confirmation-message').textContent = message;
+            document.getElementById('confirm-yes').onclick = () => {
+                onConfirm();
+                closeConfirmationModal();
+            };
+            document.getElementById('confirmation-modal').style.display = 'block';
+        }
+
+        function closeConfirmationModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        // Data persistence
+        function saveData() {
+            try {
+                const data = {
+                    presentStudents: presentStudents,
+                    timestamp: new Date().toISOString()
+                };
+                // In a real application, this would save to a database
+                console.log('Data saved:', data);
+            } catch (error) {
+                console.error('Failed to save data:', error);
+            }
+        }
+
+        function loadSavedData() {
+            try {
+                // In a real application, this would load from a database
+                console.log('Data loaded');
+            } catch (error) {
+                console.error('Failed to load data:', error);
+            }
+        }
+
+        // Network status monitoring
+        function checkOnlineStatus() {
+            const offlineBanner = document.getElementById('offline-banner');
+            
+            function updateOnlineStatus() {
+                if (navigator.onLine) {
+                    offlineBanner.classList.remove('show');
+                } else {
+                    offlineBanner.classList.add('show');
+                }
+            }
+            
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enter key handlers
+            document.getElementById('manual-student-name').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addStudentManually();
+                }
+            });
+            
+            document.getElementById('manual-student-roll').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addStudentManually();
+                }
+            });
+            
+            // Modal close handlers
+            window.onclick = function(event) {
+                const addModal = document.getElementById('add-manually-modal');
+                const confirmModal = document.getElementById('confirmation-modal');
+                
+                if (event.target === addModal) {
+                    closeAddManuallyModal();
+                }
+                if (event.target === confirmModal) {
+                    closeConfirmationModal();
+                }
+            }
+        });
+
+        // Simulated QR scanning (enhanced)
+        function simulateQRScanning() {
+            setInterval(() => {
+                if (qrActive && Math.random() < 0.05) { // 5% chance every interval
+                    const availableStudents = allStudents.filter(s => 
+                        !presentStudents.some(p => p.roll === s.roll)
+                    );
+                    
+                    if (availableStudents.length > 0) {
+                        const randomStudent = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+                        presentStudents.push({
+                            ...randomStudent,
+                            timestamp: new Date().toLocaleString()
+                        });
+                        updatePresentStudentsList();
+                        updateAllStats();
+                        saveData();
+                        showNotification(`${randomStudent.name} marked present via QR scan`, 'success');
+                    }
+                }
+            }, 8000); // Check every 8 seconds
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            simulateQRScanning();
+        });
+
+        // Cleanup intervals on page unload
+        window.addEventListener('beforeunload', function() {
+            if (qrInterval) clearInterval(qrInterval);
+            if (timeInterval) clearInterval(timeInterval);
+        });
+    </script>
+</body>
+</html>
