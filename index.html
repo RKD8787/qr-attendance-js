@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Attendance System</title>
+    <title>QR Attendance System - Dayananda Sagar College Of Engineering</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Global Styles */
+        :root {
+            --primary-color: #1e5aa8;
+            --primary-dark: #15417a;
+            --secondary-color: #28a745;
+            --danger-color: #dc3545;
+            --danger-dark: #c82333;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --text-color: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,62 +30,76 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f0f0;
             min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
         }
 
         .header {
-            background: linear-gradient(135deg, #1e5aa8, #2d6bb5);
-            color: white;
-            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            padding: 1.5rem;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .header h1 {
             font-size: 2.2rem;
-            font-weight: 300;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            font-weight: 300;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 2rem 1.5rem;
         }
 
         .nav-buttons {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
-            background: #007bff;
-            color: white;
+            background: var(--primary-color);
+            color: var(--white);
             border: none;
-            padding: 12px 30px;
-            margin: 0 10px;
-            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            border-radius: 2rem;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            transition: var(--transition);
             box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+            font-weight: 500;
+            min-width: 180px;
         }
 
         .nav-btn:hover {
-            background: #0056b3;
+            background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,123,255,0.3);
         }
 
         .nav-btn.active {
-            background: #28a745;
+            background: var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(40,167,69,0.2);
+        }
+
+        .nav-btn.active:hover {
+            background: #218838;
         }
 
         .page {
@@ -85,242 +116,322 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .card-header h3 {
+            color: var(--text-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
         /* Admin Page Styles */
         .admin-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 2rem;
             align-items: start;
         }
 
         .present-count-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-left: 5px solid #28a745;
+            border-left: 5px solid var(--secondary-color);
         }
 
         .present-count {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #28a745;
-            margin-bottom: 10px;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .present-students h3 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 1.3rem;
+        .present-count i {
+            font-size: 1.8rem;
         }
 
         .student-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--light-gray);
             border-radius: 8px;
-            border-left: 3px solid #007bff;
-            transition: all 0.3s ease;
+            border-left: 3px solid var(--primary-color);
+            transition: var(--transition);
         }
 
         .student-item:hover {
-            background: #e9ecef;
+            background: var(--medium-gray);
             transform: translateX(5px);
         }
 
         .remove-btn {
-            background: #dc3545;
-            color: white;
+            background: var(--danger-color);
+            color: var(--white);
             border: none;
-            padding: 6px 12px;
+            padding: 0.4rem 0.8rem;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
 
         .remove-btn:hover {
-            background: #c82333;
+            background: var(--danger-dark);
         }
 
         .add-manually-btn {
-            background: #007bff;
-            color: white;
+            background: var(--primary-color);
+            color: var(--white);
             border: none;
-            padding: 12px 25px;
+            padding: 0.8rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: var(--transition);
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .add-manually-btn:hover {
-            background: #0056b3;
+            background: var(--primary-dark);
             transform: translateY(-1px);
         }
 
         .qr-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .qr-section h3 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 1.2rem;
-            line-height: 1.4;
         }
 
         .qr-code {
             width: 200px;
             height: 200px;
-            margin: 20px auto;
-            background: white;
+            margin: 1.5rem auto;
+            background: var(--white);
             border: 2px solid #ddd;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-code::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 5px,
+                transparent 5px,
+                transparent 10px
+            );
+            opacity: 0.3;
         }
 
         .qr-instruction {
-            color: #666;
-            margin-top: 15px;
-            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Student Page Styles */
         .student-selection {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             max-width: 600px;
             margin: 0 auto;
         }
 
         .student-selection h2 {
             text-align: center;
-            margin-bottom: 25px;
-            color: #333;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
             font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .student-list {
             max-height: 400px;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--light-gray);
+        }
+
+        .student-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .student-list::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 4px;
+        }
+
+        .student-list::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
         }
 
         .student-checkbox {
             display: flex;
             align-items: center;
-            padding: 15px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--light-gray);
             border-radius: 8px;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             cursor: pointer;
         }
 
         .student-checkbox:hover {
-            background: #e9ecef;
-            border-color: #007bff;
+            background: var(--medium-gray);
+            border-color: var(--primary-color);
         }
 
         .student-checkbox.selected {
             background: #e7f3ff;
-            border-color: #007bff;
+            border-color: var(--primary-color);
         }
 
         .student-checkbox input {
-            margin-right: 12px;
+            margin-right: 0.8rem;
             transform: scale(1.2);
             cursor: pointer;
+            accent-color: var(--primary-color);
         }
 
         .student-checkbox label {
-            font-size: 16px;
+            font-size: 1rem;
             cursor: pointer;
             flex-grow: 1;
+            font-weight: 500;
         }
 
         .submit-btn {
-            background: #007bff;
-            color: white;
+            background: var(--primary-color);
+            color: var(--white);
             border: none;
-            padding: 15px 40px;
+            padding: 1rem 2.5rem;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 25px;
+            font-size: 1rem;
+            margin-top: 1.5rem;
             display: block;
             margin-left: auto;
             margin-right: auto;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .submit-btn:hover {
-            background: #0056b3;
+            background: var(--primary-dark);
             transform: translateY(-2px);
         }
 
         .submit-btn:disabled {
-            background: #ccc;
+            background: var(--dark-gray);
             cursor: not-allowed;
             transform: none;
+            opacity: 0.7;
         }
 
         /* Success Page Styles */
         .success-message {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             max-width: 500px;
-            margin: 50px auto;
+            margin: 3rem auto;
         }
 
         .success-message h2 {
-            color: #28a745;
-            margin-bottom: 15px;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
             font-size: 1.8rem;
+            font-weight: 600;
         }
 
         .success-message p {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.5;
+            color: var(--text-light);
+            font-size: 1rem;
         }
 
         .checkmark {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: #28a745;
-            margin: 0 auto 20px;
+            background: var(--secondary-color);
+            margin: 0 auto 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 40px;
+            color: var(--white);
+            font-size: 2.5rem;
             animation: scaleIn 0.5s ease;
         }
 
         @keyframes scaleIn {
             from { transform: scale(0); }
             to { transform: scale(1); }
+        }
+
+        /* Status Message */
+        .status-message {
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-message.show {
+            opacity: 1;
+        }
+
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         /* Modal Styles */
@@ -334,70 +445,144 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(3px);
         }
 
         .modal-content {
-            background: white;
-            margin: 15% auto;
-            padding: 25px;
+            background: var(--white);
+            margin: 10vh auto;
+            padding: 1.5rem;
             border-radius: 12px;
             width: 90%;
             max-width: 400px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            font-size: 1.3rem;
         }
 
         .modal input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 0.8rem;
+            margin: 0.5rem 0 1rem;
             border: 2px solid #ddd;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .modal input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 90, 168, 0.2);
         }
 
         .modal-buttons {
-            margin-top: 20px;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
         }
 
         .modal-btn {
-            padding: 10px 20px;
-            margin: 0 5px;
+            padding: 0.7rem 1.2rem;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-weight: 500;
+            min-width: 80px;
         }
 
         .modal-btn.primary {
-            background: #007bff;
-            color: white;
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .modal-btn.primary:hover {
+            background: var(--primary-dark);
         }
 
         .modal-btn.secondary {
-            background: #6c757d;
-            color: white;
+            background: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .modal-btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .admin-content {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 1.5rem;
             }
             
             .header h1 {
                 font-size: 1.8rem;
             }
             
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
             .nav-btn {
-                display: block;
-                margin: 5px auto;
-                width: 200px;
+                width: 100%;
+                max-width: 250px;
             }
             
             .container {
-                padding: 20px 15px;
+                padding: 1.5rem 1rem;
+            }
+
+            .student-selection {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .card-header h3 {
+                font-size: 1.1rem;
+            }
+            
+            .present-count {
+                font-size: 2rem;
             }
         }
     </style>
@@ -405,62 +590,83 @@
 <body>
     <div class="header">
         <h1>Dayananda Sagar College Of Engineering</h1>
-        <p>Attendance Portal</p>
+        <p>QR Code Attendance Portal</p>
     </div>
 
     <div class="container">
         <div class="nav-buttons">
-            <button class="nav-btn active" onclick="showPage('admin')">Faculty View</button>
-            <button class="nav-btn" onclick="showPage('student')">Student View</button>
+            <button class="nav-btn active" onclick="showPage('admin')">
+                <i class="fas fa-chalkboard-teacher"></i> Faculty View
+            </button>
+            <button class="nav-btn" onclick="showPage('student')">
+                <i class="fas fa-user-graduate"></i> Student View
+            </button>
         </div>
+
+        <!-- Status message container -->
+        <div id="status-message" class="status-message"></div>
 
         <!-- Admin/Faculty Page -->
         <div id="admin-page" class="page active">
             <div class="admin-content">
-                <div class="present-count-card">
-                    <div class="present-count">Present Count: <span id="present-count">0</span></div>
-                    <div class="present-students">
-                        <h3>Present Students</h3>
-                        <div id="present-students-list">
-                            <div class="student-item" style="opacity: 0.5; font-style: italic;">
-                                No students marked present yet
-                            </div>
-                        </div>
-                        <button class="add-manually-btn" onclick="showAddManuallyModal()">+ Add Manually</button>
+                <div class="card present-count-card">
+                    <div class="present-count">
+                        <i class="fas fa-users"></i>
+                        <span>Present: <span id="present-count">0</span></span>
                     </div>
+                    <div class="card-header">
+                        <h3>Present Students</h3>
+                        <span class="badge" id="present-badge">0</span>
+                    </div>
+                    <div id="present-students-list">
+                        <div class="student-item" style="opacity: 0.7; font-style: italic;">
+                            <span>No students marked present yet</span>
+                        </div>
+                    </div>
+                    <button class="add-manually-btn" onclick="showAddManuallyModal()">
+                        <i class="fas fa-plus-circle"></i> Add Manually
+                    </button>
                 </div>
 
-                <div class="qr-section">
-                    <h3>Connect to College Wi-Fi and Scan the QR Code to Mark Attendance</h3>
-                    <div class="qr-code" id="qr-code">
-                        <div style="text-align: center;">
-                            <div style="font-size: 50px; margin-bottom: 10px;">📱</div>
-                            <div>QR Code</div>
-                        </div>
+                <div class="card qr-section">
+                    <div class="card-header">
+                        <h3>QR Attendance</h3>
+                        <i class="fas fa-qrcode"></i>
                     </div>
-                    <p class="qr-instruction">Please scan the QR code to mark your attendance.</p>
-                    <button class="nav-btn" onclick="generateQR()" style="margin-top: 15px;">Generate New QR</button>
+                    <p>Connect to college Wi-Fi and scan the QR code to mark attendance</p>
+                    <div class="qr-code" id="qr-code">
+                        <div class="spinner" id="qr-spinner"></div>
+                    </div>
+                    <p class="qr-instruction">Scan this QR code using your mobile device to mark your attendance</p>
+                    <button class="nav-btn" onclick="generateQR()" style="margin-top: 1rem;">
+                        <i class="fas fa-sync-alt"></i> Generate New QR
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Student Page -->
         <div id="student-page" class="page">
-            <div class="student-selection">
-                <h2>Select Your Name</h2>
+            <div class="card student-selection">
+                <h2><i class="fas fa-user-check"></i> Select Your Name</h2>
                 <div class="student-list" id="student-list">
                     <!-- Students will be populated by JavaScript -->
                 </div>
-                <button class="submit-btn" id="submit-attendance" onclick="submitAttendance()" disabled>Submit</button>
+                <button class="submit-btn" id="submit-attendance" onclick="submitAttendance()" disabled>
+                    <i class="fas fa-paper-plane"></i> Submit Attendance
+                </button>
             </div>
         </div>
 
         <!-- Success Page -->
         <div id="success-page" class="page">
-            <div class="success-message">
-                <div class="checkmark">✓</div>
-                <h2>Attendance Submitted Successfully.</h2>
-                <p>You may close the page.</p>
+            <div class="card success-message">
+                <div class="checkmark"><i class="fas fa-check"></i></div>
+                <h2>Attendance Submitted Successfully</h2>
+                <p>Your attendance has been recorded. You may now close this page.</p>
+                <button class="nav-btn" onclick="showPage('student')" style="margin-top: 1.5rem;">
+                    <i class="fas fa-arrow-left"></i> Back to Student View
+                </button>
             </div>
         </div>
     </div>
@@ -468,11 +674,15 @@
     <!-- Add Manually Modal -->
     <div id="add-manually-modal" class="modal">
         <div class="modal-content">
-            <h3>Add Student Manually</h3>
-            <input type="text" id="manual-student-name" placeholder="Enter student name">
+            <h3><i class="fas fa-user-plus"></i> Add Student Manually</h3>
+            <input type="text" id="manual-student-name" placeholder="Enter student name" autocomplete="off">
             <div class="modal-buttons">
-                <button class="modal-btn primary" onclick="addStudentManually()">Add</button>
-                <button class="modal-btn secondary" onclick="closeAddManuallyModal()">Cancel</button>
+                <button class="modal-btn secondary" onclick="closeAddManuallyModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="modal-btn primary" onclick="addStudentManually()">
+                    <i class="fas fa-check"></i> Add
+                </button>
             </div>
         </div>
     </div>
@@ -488,12 +698,33 @@
 
         let presentStudents = [];
         let selectedStudents = [];
+        let qrCodeExpiry = null;
 
         // Initialize the application
         function initApp() {
             populateStudentList();
             updatePresentCount();
             generateQR();
+            
+            // Load data from localStorage if available
+            const savedPresentStudents = localStorage.getItem('presentStudents');
+            if (savedPresentStudents) {
+                presentStudents = JSON.parse(savedPresentStudents);
+                updatePresentStudentsList();
+                updatePresentCount();
+            }
+        }
+
+        // Show status message
+        function showStatusMessage(message, type = 'success') {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type} show`;
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
         }
 
         // Show different pages
@@ -513,6 +744,11 @@
             
             // Add active class to clicked button
             event.target.classList.add('active');
+            
+            // Reset student selection when switching to student view
+            if (page === 'student') {
+                resetStudentSelection();
+            }
         }
 
         // Populate student list for selection
@@ -557,18 +793,39 @@
         function submitAttendance() {
             if (selectedStudents.length === 0) return;
             
-            // Add selected students to present list (avoid duplicates)
-            selectedStudents.forEach(student => {
-                if (!presentStudents.includes(student)) {
-                    presentStudents.push(student);
-                }
-            });
+            // Show loading state
+            const submitBtn = document.getElementById('submit-attendance');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Processing...';
+            submitBtn.disabled = true;
             
-            updatePresentStudentsList();
-            updatePresentCount();
-            
-            // Show success page
-            showSuccessPage();
+            // Simulate API call delay
+            setTimeout(() => {
+                // Add selected students to present list (avoid duplicates)
+                const addedStudents = [];
+                selectedStudents.forEach(student => {
+                    if (!presentStudents.includes(student)) {
+                        presentStudents.push(student);
+                        addedStudents.push(student);
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('presentStudents', JSON.stringify(presentStudents));
+                
+                updatePresentStudentsList();
+                updatePresentCount();
+                
+                // Show success message
+                showStatusMessage(`Attendance recorded for ${addedStudents.length} student(s)`, 'success');
+                
+                // Show success page
+                showSuccessPage();
+                
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 1500);
         }
 
         // Show success page
@@ -599,13 +856,15 @@
         // Update present students list in admin view
         function updatePresentStudentsList() {
             const listContainer = document.getElementById('present-students-list');
+            const badge = document.getElementById('present-badge');
             
             if (presentStudents.length === 0) {
                 listContainer.innerHTML = `
-                    <div class="student-item" style="opacity: 0.5; font-style: italic;">
-                        No students marked present yet
+                    <div class="student-item" style="opacity: 0.7; font-style: italic;">
+                        <span>No students marked present yet</span>
                     </div>
                 `;
+                badge.textContent = '0';
                 return;
             }
             
@@ -615,17 +874,29 @@
                 studentDiv.className = 'student-item';
                 studentDiv.innerHTML = `
                     <span>${student}</span>
-                    <button class="remove-btn" onclick="removeStudent(${index})">Remove</button>
+                    <button class="remove-btn" onclick="removeStudent(${index})">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
                 `;
                 listContainer.appendChild(studentDiv);
             });
+            
+            badge.textContent = presentStudents.length;
         }
 
         // Remove student from present list
         function removeStudent(index) {
+            const removedStudent = presentStudents[index];
             presentStudents.splice(index, 1);
+            
+            // Update localStorage
+            localStorage.setItem('presentStudents', JSON.stringify(presentStudents));
+            
             updatePresentStudentsList();
             updatePresentCount();
+            
+            // Show status message
+            showStatusMessage(`Removed ${removedStudent} from attendance list`, 'success');
         }
 
         // Update present count
@@ -636,42 +907,73 @@
         // Generate QR code (simulation)
         function generateQR() {
             const qrCode = document.getElementById('qr-code');
-            const qrPatterns = [
-                '██ ▄█ ██<br>▄  █▄  ▄<br>██▄▄▄██<br> ▄█ █▄ <br>▄██▄██▄',
-                '▄█▄▄█▄█<br> █▄ ▄█ <br>██▄█▄██<br>▄ █▄█ ▄<br>█▄▄ ▄▄█',
-                '█▄█ █▄█<br> ▄███▄ <br>▄█▄▄▄█▄<br>███ ███<br>▄█▄█▄█▄'
-            ];
+            const qrSpinner = document.getElementById('qr-spinner');
             
-            const randomPattern = qrPatterns[Math.floor(Math.random() * qrPatterns.length)];
-            qrCode.innerHTML = `<div style="font-family: monospace; line-height: 1; font-size: 10px;">${randomPattern}</div>`;
+            // Show loading spinner
+            qrSpinner.style.display = 'block';
+            qrCode.innerHTML = '';
+            
+            // Simulate QR generation delay
+            setTimeout(() => {
+                qrSpinner.style.display = 'none';
+                
+                // Generate random QR pattern
+                const qrPatterns = [
+                    '██ ▄█ ██<br>▄  █▄  ▄<br>██▄▄▄██<br> ▄█ █▄ <br>▄██▄██▄',
+                    '▄█▄▄█▄█<br> █▄ ▄█ <br>██▄█▄██<br>▄ █▄█ ▄<br>█▄▄ ▄▄█',
+                    '█▄█ █▄█<br> ▄███▄ <br>▄█▄▄▄█▄<br>███ ███<br>▄█▄█▄█▄'
+                ];
+                
+                const randomPattern = qrPatterns[Math.floor(Math.random() * qrPatterns.length)];
+                qrCode.innerHTML = `<div style="font-family: monospace; line-height: 1; font-size: 10px;">${randomPattern}</div>`;
+                
+                // Set expiry time (30 minutes from now)
+                qrCodeExpiry = new Date();
+                qrCodeExpiry.setMinutes(qrCodeExpiry.getMinutes() + 30);
+                
+                // Show status message
+                showStatusMessage('New QR code generated. Expires at ' + qrCodeExpiry.toLocaleTimeString(), 'success');
+            }, 1000);
         }
 
         // Show add manually modal
         function showAddManuallyModal() {
             document.getElementById('add-manually-modal').style.display = 'block';
+            document.getElementById('manual-student-name').value = '';
             document.getElementById('manual-student-name').focus();
         }
 
         // Close add manually modal
         function closeAddManuallyModal() {
             document.getElementById('add-manually-modal').style.display = 'none';
-            document.getElementById('manual-student-name').value = '';
         }
 
         // Add student manually
         function addStudentManually() {
             const studentName = document.getElementById('manual-student-name').value.trim();
             
-            if (studentName && !presentStudents.includes(studentName)) {
-                presentStudents.push(studentName);
-                updatePresentStudentsList();
-                updatePresentCount();
-                closeAddManuallyModal();
-            } else if (presentStudents.includes(studentName)) {
-                alert('Student is already marked present!');
-            } else {
-                alert('Please enter a valid student name!');
+            if (!studentName) {
+                showStatusMessage('Please enter a student name', 'error');
+                return;
             }
+            
+            if (presentStudents.includes(studentName)) {
+                showStatusMessage('Student is already marked present', 'error');
+                return;
+            }
+            
+            // Add student
+            presentStudents.push(studentName);
+            
+            // Update localStorage
+            localStorage.setItem('presentStudents', JSON.stringify(presentStudents));
+            
+            updatePresentStudentsList();
+            updatePresentCount();
+            closeAddManuallyModal();
+            
+            // Show success message
+            showStatusMessage(`Added ${studentName} to attendance list`, 'success');
         }
 
         // Handle Enter key in modal
@@ -696,15 +998,26 @@
 
         // Simulate QR code scanning (for demo purposes)
         setInterval(() => {
-            if (Math.random() < 0.1) { // 10% chance every interval
-                const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-                if (!presentStudents.includes(randomStudent)) {
+            if (Math.random() < 0.1 && presentStudents.length < allStudents.length) {
+                // Find a student not already present
+                const availableStudents = allStudents.filter(s => !presentStudents.includes(s));
+                if (availableStudents.length > 0) {
+                    const randomStudent = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+                    
+                    // Add to present list
                     presentStudents.push(randomStudent);
+                    
+                    // Update localStorage
+                    localStorage.setItem('presentStudents', JSON.stringify(presentStudents));
+                    
                     updatePresentStudentsList();
                     updatePresentCount();
+                    
+                    // Show status message
+                    showStatusMessage(`${randomStudent} scanned QR and marked attendance`, 'success');
                 }
             }
-        }, 10000); // Check every 10 seconds
+        }, 15000); // Check every 15 seconds
     </script>
 </body>
 </html>
